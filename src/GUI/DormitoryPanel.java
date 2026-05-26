@@ -318,22 +318,13 @@ public class DormitoryPanel extends JPanel {
     }
 
     private void showOccupancyWindow() {
-        String idText = dormitoryIdField.getText().trim();
-        if (idText.isEmpty()) {
-            idText = JOptionPane.showInputDialog(this, "请输入宿舍ID：", "查看入住情况", JOptionPane.QUESTION_MESSAGE);
-        }
-        if (idText == null || idText.trim().isEmpty()) {
+        Dormitory dormitory = resolveDormitoryForOccupancy();
+        if (dormitory == null) {
             return;
         }
 
         try {
-            int dormitoryId = Integer.parseInt(idText.trim());
-            Dormitory dormitory = dormitoryManager.getDormitoryById(dormitoryId);
-            if (dormitory == null) {
-                JOptionPane.showMessageDialog(this, "未找到该宿舍。");
-                return;
-            }
-
+            int dormitoryId = dormitory.getDormitoryId();
             List<Student> students = new StudentManager().getStudentsByDormitoryId(dormitoryId);
             int occupiedBeds = dormitoryManager.getOccupiedBedCount(dormitoryId);
             int remainingBeds = dormitoryManager.getRemainingBeds(dormitoryId);
@@ -393,8 +384,55 @@ public class DormitoryPanel extends JPanel {
             bottomPanel.add(closeButton);
             dialog.add(bottomPanel, BorderLayout.SOUTH);
             dialog.setVisible(true);
-        } catch (SQLException | NumberFormatException ex) {
+        } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "查询入住情况失败：" + ex.getMessage());
+        }
+    }
+
+    private Dormitory resolveDormitoryForOccupancy() {
+        String building = buildingField.getText().trim();
+        String roomNumber = roomNumberField.getText().trim();
+
+        if (building.isEmpty() || roomNumber.isEmpty()) {
+            JPanel panel = new JPanel(new GridBagLayout());
+            panel.setOpaque(false);
+            GridBagConstraints gbc = UiKit.formConstraints();
+            JTextField buildingInput = new JTextField(15);
+            JTextField roomInput = new JTextField(15);
+            buildingInput.setText(building);
+            roomInput.setText(roomNumber);
+            UiKit.addFormField(panel, "楼栋：", buildingInput, gbc, 0, 0);
+            UiKit.addFormField(panel, "房间号：", roomInput, gbc, 1, 0);
+
+            int result = JOptionPane.showConfirmDialog(
+                    this,
+                    UiKit.createCard(panel),
+                    "查看入住情况",
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE
+            );
+            if (result != JOptionPane.OK_OPTION) {
+                return null;
+            }
+
+            building = buildingInput.getText().trim();
+            roomNumber = roomInput.getText().trim();
+        }
+
+        if (building.isEmpty() || roomNumber.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "请填写楼栋和房间号。");
+            return null;
+        }
+
+        try {
+            Dormitory dormitory = dormitoryManager.getDormitoryByBuildingAndRoom(building, roomNumber);
+            if (dormitory == null) {
+                JOptionPane.showMessageDialog(this, "未找到宿舍：" + building + " " + roomNumber + "室");
+            }
+            return dormitory;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "查询宿舍失败：" + ex.getMessage());
+            return null;
         }
     }
 

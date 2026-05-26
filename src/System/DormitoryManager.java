@@ -157,6 +157,28 @@ public class DormitoryManager {
         return null;
     }
 
+    public Dormitory getDormitoryByBuildingAndRoom(String building, String roomNumber) throws SQLException {
+        String sql = "SELECT * FROM Dormitory WHERE building = ? AND room_number = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, building);
+            stmt.setString(2, roomNumber);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Dormitory(
+                            rs.getInt("dormitory_id"),
+                            rs.getString("building"),
+                            rs.getInt("floor"),
+                            rs.getString("room_number"),
+                            rs.getInt("bed_count"),
+                            rs.getDouble("price")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
     public int getOccupiedBedCount(int dormitoryId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Student WHERE dormitory_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
