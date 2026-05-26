@@ -13,7 +13,7 @@ public class AdminLoginPanel extends JFrame {
     private JPasswordField passwordField;
     private JButton loginButton;
     private JButton registerButton;
-    private JCheckBox showPasswordCheckBox;
+    private JButton togglePasswordButton;
 
     public AdminLoginPanel() {
         UiKit.applyGlobalStyle();
@@ -67,7 +67,7 @@ public class AdminLoginPanel extends JFrame {
         passwordField.setEchoChar('•');
 
         addField(formPanel, "用户名：", usernameField, gbc, 0);
-        addPasswordField(formPanel, "密码：", passwordField, gbc, 1);
+        addPasswordField(formPanel, "密码：", createPasswordFieldPanel(), gbc, 1);
 
         return formPanel;
     }
@@ -94,7 +94,28 @@ public class AdminLoginPanel extends JFrame {
         panel.add(field, gbc);
     }
 
-    private void addPasswordField(JPanel panel, String label, JPasswordField field, GridBagConstraints gbc, int y) {
+    private JPanel createPasswordFieldPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createLineBorder(new Color(166, 174, 186)));
+        panel.setMinimumSize(new Dimension(220, 32));
+        panel.setPreferredSize(new Dimension(220, 32));
+
+        passwordField.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 4));
+        panel.add(passwordField, BorderLayout.CENTER);
+
+        togglePasswordButton = new JButton("显示");
+        togglePasswordButton.setFocusable(false);
+        togglePasswordButton.setMargin(new Insets(0, 8, 0, 8));
+        togglePasswordButton.setBorder(BorderFactory.createEmptyBorder());
+        togglePasswordButton.setContentAreaFilled(false);
+        togglePasswordButton.addActionListener(e -> togglePasswordVisibility());
+        panel.add(togglePasswordButton, BorderLayout.EAST);
+
+        return panel;
+    }
+
+    private void addPasswordField(JPanel panel, String label, JComponent field, GridBagConstraints gbc, int y) {
         gbc.gridx = 0;
         gbc.gridy = y;
         gbc.weightx = 0;
@@ -107,23 +128,15 @@ public class AdminLoginPanel extends JFrame {
         field.setMinimumSize(new Dimension(220, 32));
         field.setPreferredSize(new Dimension(220, 32));
         panel.add(field, gbc);
-
-        showPasswordCheckBox = new JCheckBox("显示密码");
-        showPasswordCheckBox.setOpaque(false);
-        showPasswordCheckBox.addActionListener(e -> togglePasswordVisibility());
-        gbc.gridx = 1;
-        gbc.gridy = y + 1;
-        gbc.weightx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(showPasswordCheckBox, gbc);
-        gbc.anchor = GridBagConstraints.CENTER;
     }
 
     private void togglePasswordVisibility() {
-        if (showPasswordCheckBox.isSelected()) {
-            passwordField.setEchoChar((char) 0); // 显示明文
+        if (passwordField.getEchoChar() == 0) {
+            passwordField.setEchoChar('•');
+            togglePasswordButton.setText("显示");
         } else {
-            passwordField.setEchoChar('•'); // 隐藏密码
+            passwordField.setEchoChar((char) 0); // 显示明文
+            togglePasswordButton.setText("隐藏");
         }
     }
 
