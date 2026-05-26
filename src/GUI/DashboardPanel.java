@@ -34,7 +34,9 @@ public class DashboardPanel extends JPanel {
         this.visitorEntryExitLogManager = visitorEntryExitLogManager;
 
         setLayout(new BorderLayout(12, 12));
+        setBackground(new Color(245, 247, 250));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        add(UiKit.createHeader("系统概览", "快速查看宿舍、学生、出入登记和访客记录规模。"), BorderLayout.NORTH);
         add(createSummaryPanel(), BorderLayout.CENTER);
         add(createBottomPanel(), BorderLayout.SOUTH);
         refresh();
@@ -42,6 +44,7 @@ public class DashboardPanel extends JPanel {
 
     private JPanel createSummaryPanel() {
         JPanel panel = new JPanel(new GridLayout(2, 2, 12, 12));
+        panel.setOpaque(false);
         panel.add(createSummaryCard("宿舍总数", dormitoryCountLabel));
         panel.add(createSummaryCard("学生总数", studentCountLabel));
         panel.add(createSummaryCard("学生出入记录", entryExitCountLabel));
@@ -51,6 +54,7 @@ public class DashboardPanel extends JPanel {
 
     private JPanel createSummaryCard(String title, JLabel valueLabel) {
         JPanel panel = new JPanel(new BorderLayout(8, 8));
+        panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(210, 210, 210)),
                 BorderFactory.createEmptyBorder(16, 16, 16, 16)
@@ -66,7 +70,8 @@ public class DashboardPanel extends JPanel {
 
     private JPanel createBottomPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        JButton refreshButton = new JButton("刷新统计");
+        panel.setOpaque(false);
+        JButton refreshButton = UiKit.secondaryButton("刷新统计");
         refreshButton.addActionListener(e -> refresh());
         panel.add(refreshTimeLabel, BorderLayout.WEST);
         panel.add(refreshButton, BorderLayout.EAST);

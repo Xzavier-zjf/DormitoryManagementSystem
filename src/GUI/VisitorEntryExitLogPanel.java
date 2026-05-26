@@ -23,58 +23,33 @@ public class VisitorEntryExitLogPanel extends JPanel {
     public VisitorEntryExitLogPanel(VisitorEntryExitLogManager visitorEntryExitLogManager) {
         this.visitorEntryExitLogManager = visitorEntryExitLogManager;
         setLayout(new BorderLayout());
+        setBackground(new Color(245, 247, 250));
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        formPanel.setOpaque(false);
+        GridBagConstraints gbc = UiKit.formConstraints();
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(new JLabel("访客姓名："), gbc);
-        gbc.gridx = 1;
         visitorNameField = new JTextField(15);
-        formPanel.add(visitorNameField, gbc);
+        UiKit.addFormField(formPanel, "访客姓名：", visitorNameField, gbc, 0, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        formPanel.add(new JLabel("访客电话："), gbc);
-        gbc.gridx = 1;
         visitorPhoneField = new JTextField(15);
-        formPanel.add(visitorPhoneField, gbc);
+        UiKit.addFormField(formPanel, "访客电话：", visitorPhoneField, gbc, 0, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        formPanel.add(new JLabel("访问目的："), gbc);
-        gbc.gridx = 1;
         visitorPurposeField = new JTextField(15);
-        formPanel.add(visitorPurposeField, gbc);
+        UiKit.addFormField(formPanel, "访问目的：", visitorPurposeField, gbc, 1, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        formPanel.add(new JLabel("进入时间："), gbc);
-        gbc.gridx = 1;
         entryDateSpinner = createDateTimeSpinner();
-        formPanel.add(entryDateSpinner, gbc);
+        UiKit.addFormField(formPanel, "进入时间：", entryDateSpinner, gbc, 1, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        formPanel.add(new JLabel("离开时间："), gbc);
-        gbc.gridx = 1;
         exitDateSpinner = createDateTimeSpinner();
-        formPanel.add(exitDateSpinner, gbc);
+        UiKit.addFormField(formPanel, "离开时间：", exitDateSpinner, gbc, 2, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        formPanel.add(new JLabel("按访客电话查询出入记录："), gbc);
-        gbc.gridx = 1;
         searchVisitorIdField = new JTextField(15);
-        formPanel.add(searchVisitorIdField, gbc);
+        UiKit.addFormField(formPanel, "按电话查询：", searchVisitorIdField, gbc, 2, 1);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel buttonPanel = UiKit.createButtonPanel();
 
-        JButton logButton = new JButton("记录出入");
+        JButton logButton = UiKit.primaryButton("记录出入");
         logButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -106,7 +81,7 @@ public class VisitorEntryExitLogPanel extends JPanel {
         });
         buttonPanel.add(logButton);
 
-        JButton searchButton = new JButton("查询出入记录");
+        JButton searchButton = UiKit.secondaryButton("查询出入记录");
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -135,7 +110,7 @@ public class VisitorEntryExitLogPanel extends JPanel {
         });
         buttonPanel.add(searchButton);
 
-        JButton listAllButton = new JButton("显示所有访客出入记录");
+        JButton listAllButton = UiKit.secondaryButton("显示所有访客出入记录");
         listAllButton.addActionListener(e -> {
             try {
                 List<VisitorEntryExitLog> logs = visitorEntryExitLogManager.getAllVisitorEntryExitLogs();
@@ -168,8 +143,7 @@ public class VisitorEntryExitLogPanel extends JPanel {
         });
         buttonPanel.add(listAllButton);
 
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(UiKit.createPage("访客出入登记", "记录访客来访目的和进出时间，便于追溯访问记录。", formPanel, buttonPanel), BorderLayout.CENTER);
     }
 
     private JSpinner createDateTimeSpinner() {

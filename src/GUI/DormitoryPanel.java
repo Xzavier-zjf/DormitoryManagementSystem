@@ -24,65 +24,36 @@ public class DormitoryPanel extends JPanel {
     public DormitoryPanel(DormitoryManager dormitoryManager) {
         this.dormitoryManager = dormitoryManager;
         setLayout(new BorderLayout());
+        setBackground(new Color(245, 247, 250));
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        formPanel.setOpaque(false);
+        GridBagConstraints gbc = UiKit.formConstraints();
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(new JLabel("宿舍ID："), gbc);
-        gbc.gridx = 1;
         dormitoryIdField = new JTextField(15);
-        formPanel.add(dormitoryIdField, gbc);
+        UiKit.addFormField(formPanel, "宿舍ID：", dormitoryIdField, gbc, 0, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        formPanel.add(new JLabel("楼栋："), gbc);
-        gbc.gridx = 1;
         buildingField = new JTextField(15);
-        formPanel.add(buildingField, gbc);
+        UiKit.addFormField(formPanel, "楼栋：", buildingField, gbc, 0, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        formPanel.add(new JLabel("楼层："), gbc);
-        gbc.gridx = 1;
         floorField = new JTextField(15);
-        formPanel.add(floorField, gbc);
+        UiKit.addFormField(formPanel, "楼层：", floorField, gbc, 1, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        formPanel.add(new JLabel("房间号："), gbc);
-        gbc.gridx = 1;
         roomNumberField = new JTextField(15);
-        formPanel.add(roomNumberField, gbc);
+        UiKit.addFormField(formPanel, "房间号：", roomNumberField, gbc, 1, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        formPanel.add(new JLabel("床位数："), gbc);
-        gbc.gridx = 1;
         bedCountField = new JTextField(15);
-        formPanel.add(bedCountField, gbc);
+        UiKit.addFormField(formPanel, "床位数：", bedCountField, gbc, 2, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        formPanel.add(new JLabel("单价："), gbc);
-        gbc.gridx = 1;
         priceField = new JTextField(15);
-        formPanel.add(priceField, gbc);
+        UiKit.addFormField(formPanel, "单价：", priceField, gbc, 2, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        formPanel.add(new JLabel("按楼栋查询宿舍："), gbc);
-        gbc.gridx = 1;
         searchBuildingField = new JTextField(15);
-        formPanel.add(searchBuildingField, gbc);
+        UiKit.addFormField(formPanel, "按楼栋查询：", searchBuildingField, gbc, 3, 0);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel buttonPanel = UiKit.createButtonPanel();
 
-        JButton addButton = new JButton("添加宿舍");
+        JButton addButton = UiKit.primaryButton("添加宿舍");
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -106,7 +77,7 @@ public class DormitoryPanel extends JPanel {
         });
         buttonPanel.add(addButton);
 
-        JButton updateButton = new JButton("更新宿舍");
+        JButton updateButton = UiKit.secondaryButton("更新宿舍");
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -132,7 +103,7 @@ public class DormitoryPanel extends JPanel {
         });
         buttonPanel.add(updateButton);
 
-        JButton deleteButton = new JButton("删除宿舍");
+        JButton deleteButton = UiKit.secondaryButton("删除宿舍");
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -151,7 +122,7 @@ public class DormitoryPanel extends JPanel {
         });
         buttonPanel.add(deleteButton);
 
-        JButton searchButton = new JButton("查询宿舍");
+        JButton searchButton = UiKit.secondaryButton("查询宿舍");
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -179,18 +150,17 @@ public class DormitoryPanel extends JPanel {
         });
         buttonPanel.add(searchButton);
 
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(UiKit.createPage("宿舍管理", "维护宿舍基础信息，查看入住情况和剩余床位。", formPanel, buttonPanel), BorderLayout.CENTER);
 
-        JButton clearButton = new JButton("清空表单");
+        JButton clearButton = UiKit.secondaryButton("清空表单");
         clearButton.addActionListener(e -> clearForm());
         buttonPanel.add(clearButton);
 
-        JButton occupancyButton = new JButton("入住情况");
+        JButton occupancyButton = UiKit.secondaryButton("入住情况");
         occupancyButton.addActionListener(e -> showOccupancyWindow());
         buttonPanel.add(occupancyButton);
 
-        JButton listAllButton = new JButton("显示所有宿舍");
+        JButton listAllButton = UiKit.secondaryButton("显示所有宿舍");
         listAllButton.addActionListener(e -> showDormitoryTableWindow());
         buttonPanel.add(listAllButton);
 

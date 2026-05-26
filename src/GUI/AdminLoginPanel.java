@@ -16,8 +16,10 @@ public class AdminLoginPanel extends JFrame {
     private JCheckBox showPasswordCheckBox;
 
     public AdminLoginPanel() {
+        UiKit.applyGlobalStyle();
         setTitle("管理员登录");
-        setSize(400, 300);
+        setSize(460, 320);
+        setMinimumSize(new Dimension(420, 300));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -34,9 +36,18 @@ public class AdminLoginPanel extends JFrame {
         JPanel formPanel = createFormPanel();
         JPanel buttonPanel = createButtonPanel();
 
-        JPanel contentPanel = new JPanel(new BorderLayout());
+        JPanel contentPanel = new JPanel(new BorderLayout(0, 14));
+        contentPanel.setBackground(new Color(245, 247, 250));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(22, 24, 22, 24));
+        contentPanel.add(UiKit.createHeader("管理员登录", "登录后进入学生宿舍管理系统。"), BorderLayout.NORTH);
+        formPanel.setOpaque(false);
+        JPanel formCard = UiKit.createCard(formPanel);
+        buttonPanel.setOpaque(false);
+
         contentPanel.add(formPanel, BorderLayout.CENTER);
-        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+        contentPanel.remove(formPanel);
+        contentPanel.add(formCard, BorderLayout.CENTER);
+        contentPanel.add(UiKit.createButtonBar(buttonPanel), BorderLayout.SOUTH);
 
         add(contentPanel, BorderLayout.CENTER);
 
@@ -90,9 +101,9 @@ public class AdminLoginPanel extends JFrame {
     }
 
     private JPanel createButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel buttonPanel = UiKit.createButtonPanel();
 
-        loginButton = new JButton("登录");
+        loginButton = UiKit.primaryButton("登录");
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -101,7 +112,7 @@ public class AdminLoginPanel extends JFrame {
         });
         buttonPanel.add(loginButton);
 
-        registerButton = new JButton("注册");
+        registerButton = UiKit.secondaryButton("注册");
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

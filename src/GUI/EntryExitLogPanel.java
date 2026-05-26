@@ -22,44 +22,27 @@ public class EntryExitLogPanel extends JPanel {
     public EntryExitLogPanel(EntryExitLogManager entryExitLogManager) {
         this.entryExitLogManager = entryExitLogManager;
         setLayout(new BorderLayout());
+        setBackground(new Color(245, 247, 250));
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        formPanel.setOpaque(false);
+        GridBagConstraints gbc = UiKit.formConstraints();
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(new JLabel("学生学号："), gbc);
-        gbc.gridx = 1;
         studentNumberField = new JTextField(15);
-        formPanel.add(studentNumberField, gbc);
+        UiKit.addFormField(formPanel, "学生学号：", studentNumberField, gbc, 0, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        formPanel.add(new JLabel("进入时间："), gbc);
-        gbc.gridx = 1;
         entryDateSpinner = createDateTimeSpinner();
-        formPanel.add(entryDateSpinner, gbc);
+        UiKit.addFormField(formPanel, "进入时间：", entryDateSpinner, gbc, 0, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        formPanel.add(new JLabel("离开时间："), gbc);
-        gbc.gridx = 1;
         exitDateSpinner = createDateTimeSpinner();
-        formPanel.add(exitDateSpinner, gbc);
+        UiKit.addFormField(formPanel, "离开时间：", exitDateSpinner, gbc, 1, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        formPanel.add(new JLabel("按学生学号查询出入记录："), gbc);
-        gbc.gridx = 1;
         searchStudentIdField = new JTextField(15);
-        formPanel.add(searchStudentIdField, gbc);
+        UiKit.addFormField(formPanel, "按学号查询：", searchStudentIdField, gbc, 1, 1);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel buttonPanel = UiKit.createButtonPanel();
 
-        JButton logButton = new JButton("记录出入");
+        JButton logButton = UiKit.primaryButton("记录出入");
         logButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -88,7 +71,7 @@ public class EntryExitLogPanel extends JPanel {
         });
         buttonPanel.add(logButton);
 
-        JButton searchButton = new JButton("查询出入记录");
+        JButton searchButton = UiKit.secondaryButton("查询出入记录");
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -115,7 +98,7 @@ public class EntryExitLogPanel extends JPanel {
         });
         buttonPanel.add(searchButton);
 
-        JButton listAllButton = new JButton("显示所有出入记录");
+        JButton listAllButton = UiKit.secondaryButton("显示所有出入记录");
         listAllButton.addActionListener(e -> {
             try {
                 List<EntryExitLog> logs = entryExitLogManager.getAllEntryExitLogs();
@@ -146,8 +129,7 @@ public class EntryExitLogPanel extends JPanel {
         });
         buttonPanel.add(listAllButton);
 
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(UiKit.createPage("学生出入登记", "登记学生进出宿舍时间，并按学号追踪历史记录。", formPanel, buttonPanel), BorderLayout.CENTER);
     }
 
     private JSpinner createDateTimeSpinner() {

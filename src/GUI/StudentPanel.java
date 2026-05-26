@@ -33,100 +33,51 @@ public class StudentPanel extends JPanel {
         this.studentManager = studentManager;
         this.dormitoryManager = dormitoryManager;
         setLayout(new BorderLayout());
+        setBackground(new Color(245, 247, 250));
 
         JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        formPanel.setOpaque(false);
+        GridBagConstraints gbc = UiKit.formConstraints();
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(new JLabel("学生ID："), gbc);
-        gbc.gridx = 1;
         studentIdField = new JTextField(15);
-        formPanel.add(studentIdField, gbc);
+        UiKit.addFormField(formPanel, "学生ID：", studentIdField, gbc, 0, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        formPanel.add(new JLabel("学号："), gbc);
-        gbc.gridx = 1;
         studentNumberField = new JTextField(15);
-        formPanel.add(studentNumberField, gbc);
+        UiKit.addFormField(formPanel, "学号：", studentNumberField, gbc, 0, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        formPanel.add(new JLabel("姓名："), gbc);
-        gbc.gridx = 1;
         nameField = new JTextField(15);
-        formPanel.add(nameField, gbc);
+        UiKit.addFormField(formPanel, "姓名：", nameField, gbc, 1, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        formPanel.add(new JLabel("性别："), gbc);
-        gbc.gridx = 1;
         genderField = new JTextField(15);
-        formPanel.add(genderField, gbc);
+        UiKit.addFormField(formPanel, "性别：", genderField, gbc, 1, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        formPanel.add(new JLabel("年龄："), gbc);
-        gbc.gridx = 1;
         ageField = new JTextField(15);
-        formPanel.add(ageField, gbc);
+        UiKit.addFormField(formPanel, "年龄：", ageField, gbc, 2, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        formPanel.add(new JLabel("系别："), gbc);
-        gbc.gridx = 1;
         departmentField = new JTextField(15);
-        formPanel.add(departmentField, gbc);
+        UiKit.addFormField(formPanel, "系别：", departmentField, gbc, 2, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        formPanel.add(new JLabel("年级："), gbc);
-        gbc.gridx = 1;
         gradeField = new JTextField(15);
-        formPanel.add(gradeField, gbc);
+        UiKit.addFormField(formPanel, "年级：", gradeField, gbc, 3, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 7;
-        formPanel.add(new JLabel("电话："), gbc);
-        gbc.gridx = 1;
         phoneField = new JTextField(15);
-        formPanel.add(phoneField, gbc);
+        UiKit.addFormField(formPanel, "电话：", phoneField, gbc, 3, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 8;
-        formPanel.add(new JLabel("床号："), gbc);
-        gbc.gridx = 1;
         bednumField = new JTextField(15);
-        formPanel.add(bednumField, gbc);
+        UiKit.addFormField(formPanel, "床号：", bednumField, gbc, 4, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 9;
-        formPanel.add(new JLabel("是否缴费："), gbc);
-        gbc.gridx = 1;
         feepaidField = new JTextField(15);
-        formPanel.add(feepaidField, gbc);
+        UiKit.addFormField(formPanel, "是否缴费：", feepaidField, gbc, 4, 1);
 
-        gbc.gridx = 0;
-        gbc.gridy = 10;
-        formPanel.add(new JLabel("宿舍ID："), gbc);
-        gbc.gridx = 1;
         dormitoryIdField = new JTextField(15);
-        formPanel.add(dormitoryIdField, gbc);
+        UiKit.addFormField(formPanel, "宿舍ID：", dormitoryIdField, gbc, 5, 0);
 
-        gbc.gridx = 0;
-        gbc.gridy = 11;
-        formPanel.add(new JLabel("按姓名查询学生："), gbc);
-        gbc.gridx = 1;
         searchNameField = new JTextField(15);
-        formPanel.add(searchNameField, gbc);
+        UiKit.addFormField(formPanel, "按姓名查询：", searchNameField, gbc, 5, 1);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel buttonPanel = UiKit.createButtonPanel();
 
-        JButton addButton = new JButton("添加学生");
+        JButton addButton = UiKit.primaryButton("添加学生");
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -155,7 +106,7 @@ public class StudentPanel extends JPanel {
         });
         buttonPanel.add(addButton);
 
-        JButton updateButton = new JButton("更新学生");
+        JButton updateButton = UiKit.secondaryButton("更新学生");
         updateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -186,7 +137,7 @@ public class StudentPanel extends JPanel {
         });
         buttonPanel.add(updateButton);
 
-        JButton deleteButton = new JButton("删除学生");
+        JButton deleteButton = UiKit.secondaryButton("删除学生");
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -205,7 +156,7 @@ public class StudentPanel extends JPanel {
         });
         buttonPanel.add(deleteButton);
 
-        JButton searchButton = new JButton("查询学生");
+        JButton searchButton = UiKit.secondaryButton("查询学生");
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -238,14 +189,13 @@ public class StudentPanel extends JPanel {
         });
         buttonPanel.add(searchButton);
 
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(UiKit.createPage("学生管理", "维护学生信息，支持表格批量编辑并校验床位占用。", formPanel, buttonPanel), BorderLayout.CENTER);
 
-        JButton clearButton = new JButton("清空表单");
+        JButton clearButton = UiKit.secondaryButton("清空表单");
         clearButton.addActionListener(e -> clearForm());
         buttonPanel.add(clearButton);
 
-        JButton listAllButton = new JButton("显示所有学生");
+        JButton listAllButton = UiKit.secondaryButton("显示所有学生");
         listAllButton.addActionListener(e -> showStudentTableWindow());
         buttonPanel.add(listAllButton);
     }

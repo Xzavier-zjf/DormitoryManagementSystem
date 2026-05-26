@@ -29,6 +29,7 @@ public class MainFrame extends JFrame {
             return;
         }
 
+        UiKit.applyGlobalStyle();
         this.username = username;
         dormitoryManager = new DormitoryManager();
         studentManager = new StudentManager();
@@ -38,7 +39,8 @@ public class MainFrame extends JFrame {
         StudentPanel studentPanel = new StudentPanel(studentManager, dormitoryManager); // 传递两个参数
 
         setTitle("学生宿舍管理系统");
-        setSize(800, 600);
+        setSize(1120, 760);
+        setMinimumSize(new Dimension(980, 680));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -186,6 +188,7 @@ public class MainFrame extends JFrame {
     }
 
     public static void main(String[] args) {
+        UiKit.applyGlobalStyle();
         SwingUtilities.invokeLater(() -> {
             AdminLoginPanel loginFrame = new AdminLoginPanel();
             loginFrame.setVisible(true);
