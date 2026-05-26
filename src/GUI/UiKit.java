@@ -122,9 +122,10 @@ public class UiKit {
 
     public static JButton primaryButton(String text) {
         JButton button = new JButton(text);
-        button.setForeground(Color.WHITE);
-        button.setBackground(PRIMARY_COLOR);
+        button.setForeground(new Color(24, 48, 84));
+        button.setBackground(new Color(224, 236, 252));
         button.setFocusPainted(false);
+        button.setOpaque(true);
         return button;
     }
 

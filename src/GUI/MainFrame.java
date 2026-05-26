@@ -56,9 +56,26 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("出入登记管理", new EntryExitLogPanel(entryExitLogManager));
         tabbedPane.addTab("访客出入登记管理", new VisitorEntryExitLogPanel(visitorEntryExitLogManager));
 
+        add(createTopBar(), BorderLayout.NORTH);
         add(tabbedPane, BorderLayout.CENTER);
         setJMenuBar(createMenuBar());
         setLocationRelativeTo(null);
+    }
+
+    private JPanel createTopBar() {
+        JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setBackground(new Color(245, 247, 250));
+        topBar.setBorder(BorderFactory.createEmptyBorder(10, 18, 10, 18));
+
+        JLabel userLabel = new JLabel("当前用户：" + username);
+        userLabel.setFont(userLabel.getFont().deriveFont(Font.PLAIN, 14f));
+        topBar.add(userLabel, BorderLayout.WEST);
+
+        JButton logoutButton = UiKit.secondaryButton("退出登录");
+        logoutButton.addActionListener(e -> logout());
+        topBar.add(logoutButton, BorderLayout.EAST);
+
+        return topBar;
     }
 
     private JMenuBar createMenuBar() {
