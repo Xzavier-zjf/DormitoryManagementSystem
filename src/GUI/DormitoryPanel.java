@@ -186,6 +186,10 @@ public class DormitoryPanel extends JPanel {
         clearButton.addActionListener(e -> clearForm());
         buttonPanel.add(clearButton);
 
+        JButton occupancyButton = new JButton("入住情况");
+        occupancyButton.addActionListener(e -> showOccupancyWindow());
+        buttonPanel.add(occupancyButton);
+
         JButton listAllButton = new JButton("显示所有宿舍");
         listAllButton.addActionListener(e -> showDormitoryTableWindow());
         buttonPanel.add(listAllButton);
@@ -341,6 +345,87 @@ public class DormitoryPanel extends JPanel {
         bedCountField.setText("");
         priceField.setText("");
         searchBuildingField.setText("");
+    }
+
+    private void showOccupancyWindow() {
+        String idText = dormitoryIdField.getText().trim();
+        if (idText.isEmpty()) {
+            idText = JOptionPane.showInputDialog(this, "请输入宿舍ID：", "查看入住情况", JOptionPane.QUESTION_MESSAGE);
+        }
+        if (idText == null || idText.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            int dormitoryId = Integer.parseInt(idText.trim());
+            Dormitory dormitory = dormitoryManager.getDormitoryById(dormitoryId);
+            if (dormitory == null) {
+                JOptionPane.showMessageDialog(this, "未找到该宿舍。");
+                return;
+            }
+
+            List<Student> students = new StudentManager().getStudentsByDormitoryId(dormitoryId);
+            int occupiedBeds = dormitoryManager.getOccupiedBedCount(dormitoryId);
+            int remainingBeds = dormitoryManager.getRemainingBeds(dormitoryId);
+
+            JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "宿舍入住情况", Dialog.ModalityType.APPLICATION_MODAL);
+            dialog.setLayout(new BorderLayout(8, 8));
+            dialog.setSize(960, 520);
+            dialog.setLocationRelativeTo(this);
+
+            JLabel summaryLabel = new JLabel(String.format(
+                    "宿舍：%s %s楼 %s室    床位数：%d    已入住：%d    剩余床位：%d",
+                    dormitory.getBuilding(),
+                    dormitory.getFloor(),
+                    dormitory.getRoomNumber(),
+                    dormitory.getBedCount(),
+                    occupiedBeds,
+                    remainingBeds
+            ));
+            summaryLabel.setBorder(BorderFactory.createEmptyBorder(10, 12, 4, 12));
+            dialog.add(summaryLabel, BorderLayout.NORTH);
+
+            DefaultTableModel tableModel = new DefaultTableModel(
+                    new String[]{"学生ID", "学号", "姓名", "性别", "年龄", "系别", "年级", "电话", "床号", "是否缴费"},
+                    0
+            ) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            for (Student student : students) {
+                tableModel.addRow(new Object[]{
+                        student.getStudentId(),
+                        student.getStudentNumber(),
+                        student.getName(),
+                        student.getGender(),
+                        student.getAge(),
+                        student.getDepartment(),
+                        student.getGrade(),
+                        student.getPhone(),
+                        student.getBedNumber(),
+                        student.getFeePaid()
+                });
+            }
+
+            JTable table = new JTable(tableModel);
+            table.setRowHeight(24);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i).setPreferredWidth(i == 0 ? 80 : 110);
+            }
+            dialog.add(new JScrollPane(table), BorderLayout.CENTER);
+
+            JButton closeButton = new JButton("关闭");
+            closeButton.addActionListener(e -> dialog.dispose());
+            JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            bottomPanel.add(closeButton);
+            dialog.add(bottomPanel, BorderLayout.SOUTH);
+            dialog.setVisible(true);
+        } catch (SQLException | NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "查询入住情况失败：" + ex.getMessage());
+        }
     }
 
     private String getCell(DefaultTableModel tableModel, int row, int column) {
