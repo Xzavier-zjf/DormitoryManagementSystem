@@ -21,6 +21,16 @@ public class AdminLoginPanel extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        AdminLogin adminLogin = new AdminLogin();
+        if (!adminLogin.ensureAdminTable()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "管理员表初始化失败，请检查 MySQL 服务和数据库连接配置。",
+                    "数据库错误",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+
         JPanel formPanel = createFormPanel();
         JPanel buttonPanel = createButtonPanel();
 
@@ -137,7 +147,7 @@ public class AdminLoginPanel extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     dialog.dispose();
-                    new MainFrame().setVisible(true);
+                    new MainFrame(username).setVisible(true);
                     dispose();  // 关闭登录界面
                 }
             });

@@ -7,6 +7,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AdminLogin {
+    public boolean ensureAdminTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS Admin ("
+                + "admin_id INT AUTO_INCREMENT PRIMARY KEY,"
+                + "username VARCHAR(50) NOT NULL UNIQUE,"
+                + "password VARCHAR(100) NOT NULL"
+                + ")";
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.executeUpdate();
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean login(String username, String password) {
         String query = "SELECT password FROM Admin WHERE username = ?";
         try (Connection connection = DatabaseConnection.getConnection();
