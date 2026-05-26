@@ -18,10 +18,17 @@ public class MainFrame extends JFrame {
 
 
     public MainFrame() {
-        this(null);
+        SwingUtilities.invokeLater(() -> new AdminLoginPanel().setVisible(true));
+        dispose();
     }
 
     public MainFrame(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            SwingUtilities.invokeLater(() -> new AdminLoginPanel().setVisible(true));
+            dispose();
+            return;
+        }
+
         this.username = username;
         dormitoryManager = new DormitoryManager();
         studentManager = new StudentManager();
