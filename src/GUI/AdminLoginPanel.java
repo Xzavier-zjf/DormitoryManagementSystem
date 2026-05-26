@@ -18,8 +18,8 @@ public class AdminLoginPanel extends JFrame {
     public AdminLoginPanel() {
         UiKit.applyGlobalStyle();
         setTitle("管理员登录");
-        setSize(460, 320);
-        setMinimumSize(new Dimension(420, 300));
+        setSize(560, 380);
+        setMinimumSize(new Dimension(520, 360));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -74,37 +74,49 @@ public class AdminLoginPanel extends JFrame {
 
     private JPanel createLoginCard(JPanel formPanel) {
         JPanel card = UiKit.createCard(formPanel);
-        card.setPreferredSize(new Dimension(360, 128));
-        card.setMaximumSize(new Dimension(360, 128));
+        card.setPreferredSize(new Dimension(430, 165));
+        card.setMaximumSize(new Dimension(430, 165));
         return card;
     }
 
     private void addField(JPanel panel, String label, JTextField field, GridBagConstraints gbc, int y) {
         gbc.gridx = 0;
         gbc.gridy = y;
+        gbc.weightx = 0;
         JLabel labelComponent = new JLabel(label);
         labelComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelComponent.setPreferredSize(new Dimension(82, 28));
         panel.add(labelComponent, gbc);
         gbc.gridx = 1;
-        field.setPreferredSize(new Dimension(190, 32));
+        gbc.weightx = 1;
+        field.setMinimumSize(new Dimension(220, 32));
+        field.setPreferredSize(new Dimension(220, 32));
         panel.add(field, gbc);
     }
 
     private void addPasswordField(JPanel panel, String label, JPasswordField field, GridBagConstraints gbc, int y) {
         gbc.gridx = 0;
         gbc.gridy = y;
+        gbc.weightx = 0;
         JLabel labelComponent = new JLabel(label);
         labelComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelComponent.setPreferredSize(new Dimension(82, 28));
         panel.add(labelComponent, gbc);
         gbc.gridx = 1;
-        field.setPreferredSize(new Dimension(190, 32));
+        gbc.weightx = 1;
+        field.setMinimumSize(new Dimension(220, 32));
+        field.setPreferredSize(new Dimension(220, 32));
         panel.add(field, gbc);
 
         showPasswordCheckBox = new JCheckBox("显示密码");
         showPasswordCheckBox.setOpaque(false);
         showPasswordCheckBox.addActionListener(e -> togglePasswordVisibility());
-        gbc.gridx = 2;
+        gbc.gridx = 1;
+        gbc.gridy = y + 1;
+        gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
         panel.add(showPasswordCheckBox, gbc);
+        gbc.anchor = GridBagConstraints.CENTER;
     }
 
     private void togglePasswordVisibility() {

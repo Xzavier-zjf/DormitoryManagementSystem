@@ -92,11 +92,13 @@ public class UiKit {
         gbc.weightx = 0;
         JLabel labelComponent = new JLabel(label);
         labelComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelComponent.setPreferredSize(new Dimension(100, 28));
         panel.add(labelComponent, gbc);
 
         gbc.gridx = labelColumn + 1;
         gbc.gridy = row;
         gbc.weightx = 1;
+        field.setMinimumSize(new Dimension(170, 32));
         field.setPreferredSize(new Dimension(190, 32));
         panel.add(field, gbc);
     }
