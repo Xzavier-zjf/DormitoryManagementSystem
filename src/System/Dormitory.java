@@ -7,7 +7,6 @@ public class Dormitory {
     private String roomNumber;
     private int bedCount;
     private double price;
-    private int remainingBeds; // 新增属性
 
     public Dormitory(int dormitoryId, String building, int floor, String roomNumber, int bedCount, double price) {
         this.dormitoryId = dormitoryId;
@@ -45,7 +44,6 @@ public class Dormitory {
     public void setRoomNumber(String roomNumber) {
         this.roomNumber = roomNumber;
     }
-
     public int getBedCount() {
         return bedCount;
     }
@@ -57,14 +55,6 @@ public class Dormitory {
     }
     public void setPrice(double price) {
         this.price = price;
-    }
-
-    public int getRemainingBeds() {
-        return remainingBeds;
-    }
-
-    public void setRemainingBeds(int remainingBeds) {
-        this.remainingBeds = remainingBeds;
     }
 
 }

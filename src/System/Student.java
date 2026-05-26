@@ -29,7 +29,6 @@ public class Student {
     }
 
 
-
     // Getters and setters
 
     public void setStudentId(int studentId) {
@@ -94,7 +93,9 @@ public class Student {
         this.feePaid = feePaid;
     }
 
-    public String getFeePaid() { return feePaid; }
+    public String getFeePaid() {
+        return feePaid;
+    }
 
     public void setDormitoryId(int dormitoryId) {
         this.dormitoryId = dormitoryId;

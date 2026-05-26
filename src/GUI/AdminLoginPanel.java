@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import System.AdminLogin;
 
 public class AdminLoginPanel extends JFrame {
@@ -22,8 +21,15 @@ public class AdminLoginPanel extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Change input language to English (for Windows)
-        setInputLanguageToEnglish();
+        AdminLogin adminLogin = new AdminLogin();
+        if (!adminLogin.ensureAdminTable()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "管理员表初始化失败，请检查 MySQL 服务和数据库连接配置。",
+                    "数据库错误",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
 
         JPanel formPanel = createFormPanel();
         JPanel buttonPanel = createButtonPanel();
@@ -36,15 +42,6 @@ public class AdminLoginPanel extends JFrame {
 
         // 设置窗口居中
         setLocationRelativeTo(null);
-    }
-
-    private void setInputLanguageToEnglish() {
-        try {
-            String command = "powershell.exe \"Set-WinUILanguageOverride -Language en-US\"";
-            Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private JPanel createFormPanel() {

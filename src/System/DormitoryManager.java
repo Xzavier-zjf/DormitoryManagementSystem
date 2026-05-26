@@ -7,6 +7,7 @@ import JDBC.DatabaseConnection;
 
 public class DormitoryManager {
 
+    // 添加宿舍信息
     public void addDormitory(String building, int floor, String roomNumber, int bedCount, double price) throws SQLException {
         String sql = "INSERT INTO Dormitory (building, floor, room_number, bed_count, price) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -17,18 +18,20 @@ public class DormitoryManager {
             stmt.setDouble(5, price);
 
             int rowsInserted = stmt.executeUpdate();
-            conn.commit();
 
             if (rowsInserted > 0) {
+                conn.commit();  // Explicitly commit the transaction
                 System.out.println("Dormitory added successfully!");
             } else {
-                System.out.println("Failed to add dormitory.");
+                throw new SQLException("宿舍添加失败。");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace();  // Print exception stack trace
+            throw ex;
         }
     }
 
+    // 更新宿舍信息
     public void updateDormitory(Dormitory dormitory) throws SQLException {
         String sql = "UPDATE Dormitory SET building = ?, floor = ?, room_number = ?, bed_count = ?, price = ? WHERE dormitory_id = ?";
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -40,36 +43,41 @@ public class DormitoryManager {
             stmt.setInt(6, dormitory.getDormitoryId());
 
             int rowsUpdated = stmt.executeUpdate();
-            conn.commit();
 
             if (rowsUpdated > 0) {
+                conn.commit();  // Explicitly commit the transaction
                 System.out.println("Dormitory updated successfully!");
             } else {
-                System.out.println("No dormitory found with the given ID.");
+                throw new SQLException("未找到指定ID的宿舍。");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace();  // Print exception stack trace
+            throw ex;
         }
     }
 
+    // 删除宿舍信息
     public void deleteDormitory(int dormitoryId) throws SQLException {
         String sql = "DELETE FROM Dormitory WHERE dormitory_id = ?";
         try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, dormitoryId);
 
             int rowsDeleted = stmt.executeUpdate();
-            conn.commit();
 
             if (rowsDeleted > 0) {
+                conn.commit();  // Explicitly commit the transaction
                 System.out.println("Dormitory deleted successfully!");
             } else {
-                System.out.println("No dormitory found with the given ID.");
+                throw new SQLException("未找到指定ID的宿舍。");
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            ex.printStackTrace();  // Print exception stack trace
+            throw ex;
         }
     }
 
+
+    // 根据楼栋查询宿舍信息
     public List<Dormitory> getDormitoriesByBuilding(String building) throws SQLException {
         String sql = "SELECT * FROM Dormitory WHERE building = ?";
         List<Dormitory> dormitories = new ArrayList<>();
@@ -103,38 +111,6 @@ public class DormitoryManager {
         return dormitories;
     }
 
-    public Dormitory getDormitoryById(int dormitoryId) throws SQLException {
-        String sql = "SELECT * FROM Dormitory WHERE dormitory_id = ?";
-        Dormitory dormitory = null;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, dormitoryId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    dormitory = new Dormitory(
-                            rs.getInt("dormitory_id"),
-                            rs.getString("building"),
-                            rs.getInt("floor"),
-                            rs.getString("room_number"),
-                            rs.getInt("bed_count"),
-                            rs.getDouble("price")
-                    );
-                }
-            }
-
-            if (dormitory != null) {
-                System.out.println("Dormitory query by ID successful!");
-            } else {
-                System.out.println("No dormitory found with the given ID.");
-            }
-        }
-
-        return dormitory;
-    }
-
     public List<Dormitory> getAllDormitories() throws SQLException {
         List<Dormitory> dormitories = new ArrayList<>();
         String sql = "SELECT * FROM Dormitory";
@@ -152,95 +128,7 @@ public class DormitoryManager {
                 ));
             }
         }
-
-        if (!dormitories.isEmpty()) {
-            System.out.println("Dormitories retrieved successfully.");
-        } else {
-            System.out.println("No dormitories found in the database.");
-        }
-
         return dormitories;
-    }
-
-    public int getRemainingBeds(int dormitoryId) throws SQLException {
-        String sql = "SELECT bed_count - (SELECT COUNT(*) FROM Student WHERE dormitory_id = ?) AS remaining_beds FROM Dormitory WHERE dormitory_id = ?";
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, dormitoryId);
-            stmt.setInt(2, dormitoryId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("remaining_beds");
-                }
-            }
-        }
-        return 0;
-    }
-
-    public boolean isBedNumberAvailable(int dormitoryId, String bedNumber) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM Student WHERE dormitory_id = ? AND bed_number = ?";
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, dormitoryId);
-            stmt.setString(2, bedNumber);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) == 0;
-                }
-            }
-        }
-        return false;
-    }
-
-    public List<Dormitory> getDormitoriesNotFullyOccupied() throws SQLException {
-        List<Dormitory> dormitories = new ArrayList<>();
-        String sql = "SELECT d.dormitory_id, d.building, d.floor, d.room_number, d.bed_count, d.price, " +
-                "(SELECT COUNT(*) FROM student WHERE dormitory_id = d.dormitory_id) AS current_occupancy, " +
-                "(d.bed_count - (SELECT COUNT(*) FROM student WHERE dormitory_id = d.dormitory_id)) AS remaining_beds " +
-                "FROM dormitory d " +
-                "WHERE (SELECT COUNT(*) FROM student WHERE dormitory_id = d.dormitory_id) < d.bed_count";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Dormitory dormitory = new Dormitory(
-                        rs.getInt("dormitory_id"),
-                        rs.getString("building"),
-                        rs.getInt("floor"),
-                        rs.getString("room_number"),
-                        rs.getInt("bed_count"),
-                        rs.getDouble("price")
-                );
-                dormitory.setRemainingBeds(rs.getInt("remaining_beds"));
-                dormitories.add(dormitory);
-            }
-        }
-        return dormitories;
-    }
-
-    public List<Student> getStudentsByDormitoryId(int dormitoryId) throws SQLException {
-        String sql = "SELECT * FROM Student WHERE dormitory_id = ?";
-        List<Student> students = new ArrayList<>();
-        try (Connection conn = DatabaseConnection.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, dormitoryId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Student student = new Student(
-                            rs.getInt("student_id"),
-                            rs.getString("student_number"),
-                            rs.getString("name"),
-                            rs.getString("gender"),
-                            rs.getInt("age"),
-                            rs.getString("department"),
-                            rs.getInt("grade"),
-                            rs.getString("phone"),
-                            rs.getString("bed_number"),
-                            rs.getString("fee_paid"),
-                            rs.getInt("dormitory_id")
-                    );
-                    students.add(student);
-                }
-            }
-        }
-        return students;
     }
 
 }

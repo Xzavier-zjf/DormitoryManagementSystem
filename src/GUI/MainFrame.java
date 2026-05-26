@@ -1,14 +1,13 @@
 package GUI;
 
 import javax.swing.*;
+import java.awt.*;
+import System.AdminLogin;
 import System.DormitoryManager;
 import System.StudentManager;
 import System.EntryExitLogManager;
 import System.VisitorEntryExitLogManager;
-import System.AdminLogin;
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+
 
 public class MainFrame extends JFrame {
     private DormitoryManager dormitoryManager;
@@ -17,12 +16,19 @@ public class MainFrame extends JFrame {
     private VisitorEntryExitLogManager visitorEntryExitLogManager;
     private String username;
 
+
+    public MainFrame() {
+        this(null);
+    }
+
     public MainFrame(String username) {
         this.username = username;
         dormitoryManager = new DormitoryManager();
-        studentManager = new StudentManager(dormitoryManager);
+        studentManager = new StudentManager();
         entryExitLogManager = new EntryExitLogManager();
         visitorEntryExitLogManager = new VisitorEntryExitLogManager();
+
+        StudentPanel studentPanel = new StudentPanel(studentManager, dormitoryManager); // 传递两个参数
 
         setTitle("学生宿舍管理系统");
         setSize(800, 600);
@@ -30,33 +36,52 @@ public class MainFrame extends JFrame {
         setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("宿舍管理", new DormitoryPanel(dormitoryManager, studentManager));
-        tabbedPane.addTab("学生管理", new StudentPanel(studentManager, dormitoryManager));
-        tabbedPane.addTab("学生出入登记管理", new EntryExitLogPanel(entryExitLogManager));
+        tabbedPane.addTab("系统概览", new DashboardPanel(
+                dormitoryManager,
+                studentManager,
+                entryExitLogManager,
+                visitorEntryExitLogManager
+        ));
+        tabbedPane.addTab("宿舍管理", new DormitoryPanel(dormitoryManager));
+        tabbedPane.addTab("学生管理", studentPanel);
+        tabbedPane.addTab("出入登记管理", new EntryExitLogPanel(entryExitLogManager));
         tabbedPane.addTab("访客出入登记管理", new VisitorEntryExitLogPanel(visitorEntryExitLogManager));
 
         add(tabbedPane, BorderLayout.CENTER);
+        setJMenuBar(createMenuBar());
+        setLocationRelativeTo(null);
+    }
 
-        // 添加修改密码和注销功能
+    private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         JMenu accountMenu = new JMenu("账户");
+
+        JMenuItem currentUserItem = new JMenuItem("当前用户：" + (username == null ? "未登录" : username));
+        currentUserItem.setEnabled(false);
+        accountMenu.add(currentUserItem);
 
         JMenuItem changePasswordItem = new JMenuItem("修改密码");
         changePasswordItem.addActionListener(e -> showChangePasswordDialog());
         accountMenu.add(changePasswordItem);
 
-        JMenuItem logoutItem = new JMenuItem("注销账号");
-        logoutItem.addActionListener(e -> showLogoutDialog());
+        JMenuItem logoutItem = new JMenuItem("退出登录");
+        logoutItem.addActionListener(e -> logout());
         accountMenu.add(logoutItem);
 
-        menuBar.add(accountMenu);
-        setJMenuBar(menuBar);
+        JMenuItem deleteAccountItem = new JMenuItem("注销账号");
+        deleteAccountItem.addActionListener(e -> showDeleteAccountDialog());
+        accountMenu.add(deleteAccountItem);
 
-        // 设置窗口居中
-        setLocationRelativeTo(null);
+        menuBar.add(accountMenu);
+        return menuBar;
     }
 
     private void showChangePasswordDialog() {
+        if (username == null) {
+            JOptionPane.showMessageDialog(this, "请先登录后再修改密码。");
+            return;
+        }
+
         JDialog dialog = new JDialog(this, "修改密码", true);
         dialog.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -72,102 +97,77 @@ public class MainFrame extends JFrame {
         addField(dialog, "确认新密码：", confirmPasswordField, gbc, 2);
 
         JButton submitButton = new JButton("修改");
-        submitButton.addActionListener(e -> submitPasswordChange(dialog, oldPasswordField, newPasswordField, confirmPasswordField));
+        submitButton.addActionListener(e -> {
+            String oldPassword = new String(oldPasswordField.getPassword());
+            String newPassword = new String(newPasswordField.getPassword());
+            String confirmPassword = new String(confirmPasswordField.getPassword());
 
-        KeyAdapter enterKeyListener = new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    submitPasswordChange(dialog, oldPasswordField, newPasswordField, confirmPasswordField);
-                }
+            if (oldPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "密码不能为空。");
+                return;
             }
-        };
+            if (!newPassword.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(dialog, "新密码和确认新密码不一致。");
+                return;
+            }
 
-        oldPasswordField.addKeyListener(enterKeyListener);
-        newPasswordField.addKeyListener(enterKeyListener);
-        confirmPasswordField.addKeyListener(enterKeyListener);
+            AdminLogin adminLogin = new AdminLogin();
+            if (adminLogin.updatePassword(username, oldPassword, newPassword)) {
+                JOptionPane.showMessageDialog(dialog, "密码修改成功，请重新登录。");
+                dialog.dispose();
+                logout();
+            } else {
+                JOptionPane.showMessageDialog(dialog, "旧密码错误或修改失败。");
+            }
+        });
 
         gbc.gridx = 1;
         gbc.gridy = 3;
         dialog.add(submitButton, gbc);
-
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
 
-    private void submitPasswordChange(JDialog dialog, JPasswordField oldPasswordField, JPasswordField newPasswordField, JPasswordField confirmPasswordField) {
-        String oldPassword = new String(oldPasswordField.getPassword());
-        String newPassword = new String(newPasswordField.getPassword());
-        String confirmPassword = new String(confirmPasswordField.getPassword());
+    private void showDeleteAccountDialog() {
+        if (username == null) {
+            JOptionPane.showMessageDialog(this, "请先登录后再注销账号。");
+            return;
+        }
 
-        if (!newPassword.equals(confirmPassword)) {
-            JOptionPane.showMessageDialog(dialog, "新密码和确认新密码不匹配", "错误", JOptionPane.ERROR_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "确定要注销当前账号吗？该操作不可恢复。",
+                "确认注销",
+                JOptionPane.YES_NO_OPTION
+        );
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        JPasswordField passwordField = new JPasswordField(20);
+        int input = JOptionPane.showConfirmDialog(
+                this,
+                passwordField,
+                "请输入当前账号密码",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+        if (input != JOptionPane.OK_OPTION) {
             return;
         }
 
         AdminLogin adminLogin = new AdminLogin();
-        if (adminLogin.updatePassword(username, oldPassword, newPassword)) {
-            JOptionPane.showMessageDialog(dialog, "密码修改成功", "成功", JOptionPane.INFORMATION_MESSAGE);
-            dialog.dispose();
+        if (adminLogin.deleteAccount(username, new String(passwordField.getPassword()))) {
+            JOptionPane.showMessageDialog(this, "账号已注销。");
+            logout();
         } else {
-            JOptionPane.showMessageDialog(dialog, "旧密码错误", "错误", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "密码错误或注销失败。");
         }
     }
 
-    private void showLogoutDialog() {
-        JDialog dialog = new JDialog(this, "注销账号", true);
-        dialog.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JTextField usernameField = new JTextField(20);
-        JPasswordField passwordField = new JPasswordField(20);
-
-        addField(dialog, "用户名：", usernameField, gbc, 0);
-        addField(dialog, "密码：", passwordField, gbc, 1);
-
-        JButton submitButton = new JButton("注销");
-        submitButton.addActionListener(e -> submitLogout(dialog, usernameField, passwordField));
-
-        KeyAdapter enterKeyListener = new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    submitLogout(dialog, usernameField, passwordField);
-                }
-            }
-        };
-
-        usernameField.addKeyListener(enterKeyListener);
-        passwordField.addKeyListener(enterKeyListener);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        dialog.add(submitButton, gbc);
-
-        dialog.pack();
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
-    }
-
-    private void submitLogout(JDialog dialog, JTextField usernameField, JPasswordField passwordField) {
-        String targetUsername = usernameField.getText().trim();
-        String password = new String(passwordField.getPassword());
-
-        AdminLogin adminLogin = new AdminLogin();
-        if (adminLogin.deleteAccount(targetUsername, password)) {
-            JOptionPane.showMessageDialog(dialog, "账号注销成功", "成功", JOptionPane.INFORMATION_MESSAGE);
-            dialog.dispose();
-
-            if (targetUsername.equals(this.username)) {
-                new AdminLoginPanel().setVisible(true);
-                dispose();
-            }
-        } else {
-            JOptionPane.showMessageDialog(dialog, "用户名或密码错误", "错误", JOptionPane.ERROR_MESSAGE);
-        }
+    private void logout() {
+        new AdminLoginPanel().setVisible(true);
+        dispose();
     }
 
     private void addField(Container container, String label, JComponent field, GridBagConstraints gbc, int y) {
@@ -176,5 +176,12 @@ public class MainFrame extends JFrame {
         container.add(new JLabel(label), gbc);
         gbc.gridx = 1;
         container.add(field, gbc);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            AdminLoginPanel loginFrame = new AdminLoginPanel();
+            loginFrame.setVisible(true);
+        });
     }
 }
