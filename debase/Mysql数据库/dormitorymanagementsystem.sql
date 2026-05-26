@@ -1,15 +1,4 @@
-CREATE DATABASE IF NOT EXISTS `DormitoryManagementSystem`
-    DEFAULT CHARACTER SET utf8mb4
-    DEFAULT COLLATE utf8mb4_unicode_ci;
-
 USE `DormitoryManagementSystem`;
-
--- 管理员表
-CREATE TABLE IF NOT EXISTS Admin (
-    admin_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL
-);
 
 -- 宿舍表
 CREATE TABLE IF NOT EXISTS Dormitory (

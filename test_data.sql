@@ -4,6 +4,12 @@ CREATE DATABASE IF NOT EXISTS `DormitoryManagementSystem`
 
 USE `DormitoryManagementSystem`;
 
+INSERT INTO Admin (admin_id, username, password) VALUES
+    (1, 'admin', '123456')
+ON DUPLICATE KEY UPDATE
+    username = VALUES(username),
+    password = VALUES(password);
+
 INSERT INTO Dormitory (dormitory_id, building, floor, room_number, bed_count, price) VALUES
     (1, 'A栋', 1, '101', 4, 1200.00),
     (2, 'A栋', 2, '205', 6, 1000.00),
