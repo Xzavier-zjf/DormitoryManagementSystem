@@ -41,12 +41,13 @@ public class AdminLoginPanel extends JFrame {
         contentPanel.setBorder(BorderFactory.createEmptyBorder(22, 24, 22, 24));
         contentPanel.add(UiKit.createHeader("管理员登录", "登录后进入学生宿舍管理系统。"), BorderLayout.NORTH);
         formPanel.setOpaque(false);
-        JPanel formCard = UiKit.createCard(formPanel);
+        JPanel formCard = createLoginCard(formPanel);
         buttonPanel.setOpaque(false);
 
-        contentPanel.add(formPanel, BorderLayout.CENTER);
-        contentPanel.remove(formPanel);
-        contentPanel.add(formCard, BorderLayout.CENTER);
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setOpaque(false);
+        centerPanel.add(formCard);
+        contentPanel.add(centerPanel, BorderLayout.CENTER);
         contentPanel.add(UiKit.createButtonBar(buttonPanel), BorderLayout.SOUTH);
 
         add(contentPanel, BorderLayout.CENTER);
@@ -58,7 +59,7 @@ public class AdminLoginPanel extends JFrame {
     private JPanel createFormPanel() {
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(7, 8, 7, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         usernameField = new JTextField(20);
@@ -71,22 +72,36 @@ public class AdminLoginPanel extends JFrame {
         return formPanel;
     }
 
+    private JPanel createLoginCard(JPanel formPanel) {
+        JPanel card = UiKit.createCard(formPanel);
+        card.setPreferredSize(new Dimension(360, 128));
+        card.setMaximumSize(new Dimension(360, 128));
+        return card;
+    }
+
     private void addField(JPanel panel, String label, JTextField field, GridBagConstraints gbc, int y) {
         gbc.gridx = 0;
         gbc.gridy = y;
-        panel.add(new JLabel(label), gbc);
+        JLabel labelComponent = new JLabel(label);
+        labelComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+        panel.add(labelComponent, gbc);
         gbc.gridx = 1;
+        field.setPreferredSize(new Dimension(190, 32));
         panel.add(field, gbc);
     }
 
     private void addPasswordField(JPanel panel, String label, JPasswordField field, GridBagConstraints gbc, int y) {
         gbc.gridx = 0;
         gbc.gridy = y;
-        panel.add(new JLabel(label), gbc);
+        JLabel labelComponent = new JLabel(label);
+        labelComponent.setHorizontalAlignment(SwingConstants.RIGHT);
+        panel.add(labelComponent, gbc);
         gbc.gridx = 1;
+        field.setPreferredSize(new Dimension(190, 32));
         panel.add(field, gbc);
 
         showPasswordCheckBox = new JCheckBox("显示密码");
+        showPasswordCheckBox.setOpaque(false);
         showPasswordCheckBox.addActionListener(e -> togglePasswordVisibility());
         gbc.gridx = 2;
         panel.add(showPasswordCheckBox, gbc);
@@ -173,20 +188,30 @@ public class AdminLoginPanel extends JFrame {
 
     private void handleRegister() {
         JDialog registerDialog = new JDialog(this, "管理员注册", true);
-        registerDialog.setLayout(new GridBagLayout());
+        registerDialog.setLayout(new BorderLayout(0, 14));
+        registerDialog.getContentPane().setBackground(new Color(245, 247, 250));
+        ((JComponent) registerDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(18, 20, 18, 20));
+
+        registerDialog.add(UiKit.createHeader("管理员注册", "创建新的系统管理员账号。"), BorderLayout.NORTH);
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(7, 8, 7, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JTextField newUsernameField = new JTextField(20);
         JPasswordField newPasswordField = new JPasswordField(20);
         JPasswordField confirmPasswordField = new JPasswordField(20);
 
-        addField(registerDialog, "新用户名：", newUsernameField, gbc, 0);
-        addField(registerDialog, "新密码：", newPasswordField, gbc, 1);
-        addField(registerDialog, "确认新密码：", confirmPasswordField, gbc, 2);
+        addField(formPanel, "新用户名：", newUsernameField, gbc, 0);
+        addField(formPanel, "新密码：", newPasswordField, gbc, 1);
+        addField(formPanel, "确认密码：", confirmPasswordField, gbc, 2);
 
-        JButton submitButton = new JButton("注册");
+        registerDialog.add(UiKit.createCard(formPanel), BorderLayout.CENTER);
+
+        JPanel buttonPanel = UiKit.createButtonPanel();
+        JButton submitButton = UiKit.primaryButton("注册");
         submitButton.addActionListener(e -> {
             String newUsername = newUsernameField.getText().trim();
             String newPassword = new String(newPasswordField.getPassword());
@@ -244,21 +269,12 @@ public class AdminLoginPanel extends JFrame {
         newPasswordField.addKeyListener(enterKeyListener);
         confirmPasswordField.addKeyListener(enterKeyListener);
 
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        registerDialog.add(submitButton, gbc);
+        buttonPanel.add(submitButton);
+        registerDialog.add(UiKit.createButtonBar(buttonPanel), BorderLayout.SOUTH);
 
-        registerDialog.pack();
+        registerDialog.setSize(440, 330);
         registerDialog.setLocationRelativeTo(this);
         registerDialog.setVisible(true);
-    }
-
-    private void addField(JDialog dialog, String label, JComponent field, GridBagConstraints gbc, int y) {
-        gbc.gridx = 0;
-        gbc.gridy = y;
-        dialog.add(new JLabel(label), gbc);
-        gbc.gridx = 1;
-        dialog.add(field, gbc);
     }
 
     public static void main(String[] args) {
